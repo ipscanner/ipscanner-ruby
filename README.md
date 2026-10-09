@@ -32,6 +32,8 @@ puts result["purity"]["grade"]
 
 Every method returns the parsed JSON response as a Hash with the same string keys the API sends.
 
+`vpnProvider` names the VPN brand when known. On the Free plan, premium fields come back as `nil` and are listed in `locked`, with `planRequired` naming the plan that unlocks them.
+
 ## Usage
 
 ### IP
@@ -78,6 +80,26 @@ client.agentscan.batch([{ line: 1, ip: "203.0.113.7", user_agent: "curl/8.0" }])
 client.agentscan.allowlist
 client.agentscan.self_check
 ```
+
+### Edge
+
+```ruby
+client.edge.check(ip: "203.0.113.7", site: "your-site-id", user_agent: request.user_agent)
+```
+
+### Sites
+
+```ruby
+client.sites.policy("your-site-id")
+```
+
+### Gate
+
+```ruby
+result = client.gate.verify(secret: "gs_...", token: gate_token, remote_ip: request.remote_ip)
+```
+
+`gate.verify` sends the site secret instead of the API key and is never retried.
 
 ### Provenance
 
@@ -147,7 +169,7 @@ IPScanner::Client.new(
 )
 ```
 
-Keyless endpoints (`ip.demo`, `ip.myip`, `asn_directory`, `crawlers`) work without an API key.
+Keyless endpoints (`ip.demo`, `ip.myip`, `asn_directory`, `crawlers`, `gate.verify`) work without an API key.
 
 ## Licence
 
