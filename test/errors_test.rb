@@ -24,6 +24,30 @@ class ErrorsTest < Minitest::Test
     end
   end
 
+  def test_gate_verify_errors
+    {
+      [401, "invalid_secret"] => IPScanner::AuthenticationError,
+      [400, "expired_token"] => IPScanner::APIError
+    }.each do |(status, code), klass|
+      stub_request(:post, "#{BASE}/v1/gate/verify")
+        .to_return(json_response({ "success" => false, "error" => code, "message" => "msg" }, status: status))
+
+      err = assert_raises(klass) { @client.gate.verify(secret: "gs_x", token: "t1") }
+      assert_equal status, err.status
+      assert_equal code, err.code
+      assert_equal "msg", err.message
+      assert_equal false, err.body["success"]
+    end
+  end
+
+  def test_sites_policy_unknown_site
+    stub_request(:get, "#{BASE}/v1/sites/nope/policy")
+      .to_return(json_response({ "error" => "unknown_site", "message" => "no" }, status: 404))
+
+    err = assert_raises(IPScanner::NotFoundError) { @client.sites.policy("nope") }
+    assert_equal "unknown_site", err.code
+  end
+
   def test_bulk_details
     body = { "error" => "bad_request", "message" => "no", "details" => { "invalid" => ["x"] } }
     stub_request(:post, "#{BASE}/v1/bulk/check").to_return(json_response(body, status: 400))

@@ -48,8 +48,8 @@ module IPScanner
       request(Net::HTTP::Get, path, query: query, raw: raw)
     end
 
-    def post(path, body = {})
-      request(Net::HTTP::Post, path, body: body)
+    def post(path, body = {}, auth: true)
+      request(Net::HTTP::Post, path, body: body, auth: auth)
     end
 
     def stream(path, body)
@@ -78,14 +78,14 @@ module IPScanner
 
     private
 
-    def request(klass, path, query: nil, body: nil, raw: false)
+    def request(klass, path, query: nil, body: nil, raw: false, auth: true)
       uri = build_uri(path, query)
       attempts = 0
       loop do
         attempts += 1
         begin
           res = with_errors do
-            connection(uri, @timeout).start { |http| http.request(build_request(klass, uri, body)) }
+            connection(uri, @timeout).start { |http| http.request(build_request(klass, uri, body, auth: auth)) }
           end
         rescue ConnectionError
           raise unless retryable?(klass, attempts)
@@ -135,11 +135,11 @@ module IPScanner
       http
     end
 
-    def build_request(klass, uri, body)
+    def build_request(klass, uri, body, auth: true)
       req = klass.new(uri)
       req["Accept"] = "application/json"
       req["User-Agent"] = "ipscanner-ruby/#{VERSION}"
-      req["Authorization"] = "Bearer #{@api_key}" if @api_key && !@api_key.empty?
+      req["Authorization"] = "Bearer #{@api_key}" if auth && @api_key && !@api_key.empty?
       unless body.nil?
         req["Content-Type"] = "application/json"
         req.body = JSON.generate(body)

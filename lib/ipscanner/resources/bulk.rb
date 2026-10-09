@@ -9,7 +9,7 @@ module IPScanner
       EVENT_DEFAULTS = {
         "type" => "", "index" => 0, "total" => 0, "input" => "", "reason" => "",
         "message" => "", "error" => "", "ip" => "", "verdict" => "", "classification" => "",
-        "confidence" => 0.0, "anonymized" => false, "score" => 0, "grade" => "",
+        "confidence" => 0.0, "anonymized" => false, "vpnProvider" => "", "score" => 0, "grade" => "",
         "isTorExit" => false, "asn" => "", "asnName" => "", "asnType" => "", "country" => "",
         "processed" => 0, "failed" => 0, "metered" => 0
       }.freeze
@@ -24,7 +24,7 @@ module IPScanner
         return enum_for(:stream, ips: ips, input: input) unless block_given?
 
         @http.stream("/v1/ip/bulk", body(ips, input)) do |line|
-          event = EVENT_DEFAULTS.merge(line)
+          event = EVENT_DEFAULTS.merge(line.compact)
           if event["type"] == "done"
             event["complete"] = event["reason"] == "complete" &&
                                 event["processed"] + event["failed"] >= event["total"]

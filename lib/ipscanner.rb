@@ -10,6 +10,9 @@ require_relative "ipscanner/resources/provenance"
 require_relative "ipscanner/resources/account"
 require_relative "ipscanner/resources/asn_directory"
 require_relative "ipscanner/resources/crawlers"
+require_relative "ipscanner/resources/edge"
+require_relative "ipscanner/resources/sites"
+require_relative "ipscanner/resources/gate"
 require_relative "ipscanner/client"
 
 # Ruby client for the IPScanner API.

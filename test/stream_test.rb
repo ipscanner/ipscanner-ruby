@@ -34,6 +34,28 @@ class StreamTest < Minitest::Test
     assert_equal true, events[3]["complete"]
   end
 
+  def test_stream_locked_lines
+    lines = [
+      { "type" => "meta", "total" => 2, "metered" => 2, "planRequired" => "Starter" },
+      { "type" => "result", "ip" => "1.1.1.1", "classification" => "relay", "score" => nil, "grade" => nil,
+        "verdict" => nil, "vpnProvider" => nil, "locked" => %w[score grade verdict vpnProvider] },
+      { "type" => "result", "index" => 1, "ip" => "2.2.2.2", "classification" => "vpn", "vpnProvider" => "Mullvad",
+        "score" => 40, "newField" => true },
+      { "type" => "done", "reason" => "complete", "processed" => 2, "total" => 2 }
+    ]
+    stub_request(:post, "#{BASE}/v1/ip/bulk").to_return(ndjson(*lines))
+
+    meta, locked, open, = @client.bulk.stream(ips: ["1.1.1.1", "2.2.2.2"]).to_a
+
+    assert_equal "Starter", meta["planRequired"]
+    assert_equal 0, locked["score"]
+    assert_equal "", locked["grade"]
+    assert_equal "", locked["vpnProvider"]
+    assert_equal %w[score grade verdict vpnProvider], locked["locked"]
+    assert_equal "Mullvad", open["vpnProvider"]
+    assert_equal 40, open["score"]
+  end
+
   def test_stream_block_and_incomplete_done
     meta = { "type" => "meta", "total" => 3 }
     done = { "type" => "done", "reason" => "complete", "processed" => 1, "total" => 3 }

@@ -5,7 +5,8 @@ module IPScanner
   class Client
     DEFAULT_BASE_URL = "https://ipscanner.io"
 
-    attr_reader :ip, :bulk, :agentscan, :provenance, :account, :asn_directory, :crawlers
+    attr_reader :ip, :bulk, :agentscan, :provenance, :account, :asn_directory, :crawlers,
+                :edge, :sites, :gate
 
     def initialize(api_key: nil, base_url: nil, timeout: 30, max_retries: 2)
       api_key ||= ENV.fetch("IPSCANNER_API_KEY", nil)
@@ -20,6 +21,9 @@ module IPScanner
       @account = Resources::Account.new(http)
       @asn_directory = Resources::AsnDirectory.new(http)
       @crawlers = Resources::Crawlers.new(http)
+      @edge = Resources::Edge.new(http)
+      @sites = Resources::Sites.new(http)
+      @gate = Resources::Gate.new(http)
     end
   end
 end

@@ -20,7 +20,7 @@ class ClientTest < Minitest::Test
            .with(headers: {
                    "Authorization" => "Bearer sk_test",
                    "Accept" => "application/json",
-                   "User-Agent" => "ipscanner-ruby/0.1.0"
+                   "User-Agent" => "ipscanner-ruby/0.2.0"
                  })
            .to_return(json_response({ "ip" => "1.1.1.1", "isVpn" => false, "riskScore" => 3 }))
 
