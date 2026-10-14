@@ -50,6 +50,17 @@ client.ip.demo("1.1.1.1")            # no key needed
 client.ip.myip                       # no key needed
 ```
 
+`vpn` and `proxy` carry `purity` (the score breakdown) on paid plans; a locked answer has `deductionCount` instead.
+
+### Email
+
+```ruby
+result = client.email.check("jane@outlok.com")
+# result["status"] "risky", result["reason"] "typo", result["suggestion"] "jane@outlook.com"
+```
+
+Checks syntax, throwaway domains, whether the domain receives mail, typos of big webmail domains and role addresses. The mailbox itself is not probed. One request per address.
+
 ### Bulk
 
 ```ruby
@@ -96,10 +107,11 @@ client.sites.policy("your-site-id")
 ### Gate
 
 ```ruby
-result = client.gate.verify(secret: "gs_...", token: gate_token, remote_ip: request.remote_ip)
+result = client.gate.verify(secret: "gs_...", token: gate_token, remote_ip: request.remote_ip,
+                             email: params["email"])
 ```
 
-`gate.verify` sends the site secret instead of the API key and is never retried.
+`gate.verify` sends the site secret instead of the API key and is never retried. `email` is optional; with it, `result["email"]` holds the check and its action, and `result["action"]` is the stricter of the network and email actions.
 
 ### Provenance
 
