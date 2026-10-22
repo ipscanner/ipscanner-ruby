@@ -34,7 +34,11 @@ module IPScanner
     }.freeze
 
     def self.escape(segment)
-      segment.to_s.b.gsub(/[^A-Za-z0-9\-._~]/) { |c| format("%%%02X", c.ord) }
+      value = segment.to_s
+      # "." and ".." would be resolved to another endpoint, with the API key attached.
+      raise ArgumentError, "ipscanner: invalid path segment #{value.inspect}" if [".", ".."].include?(value)
+
+      value.b.gsub(/[^A-Za-z0-9\-._~]/) { |c| format("%%%02X", c.ord) }
     end
 
     def initialize(api_key:, base_url:, timeout:, max_retries:)

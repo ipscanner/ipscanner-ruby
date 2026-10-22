@@ -58,6 +58,15 @@ class ClientTest < Minitest::Test
     assert_requested stub
   end
 
+  # No stub is registered, so a request would raise WebMock's error instead of ArgumentError.
+  def test_rejects_dot_segments
+    client = IPScanner::Client.new(api_key: "k")
+    [".", ".."].each do |seg|
+      assert_raises(ArgumentError) { client.ip.vpn(seg) }
+      assert_raises(ArgumentError) { client.sites.policy(seg) }
+    end
+  end
+
   def test_query_params_skip_nil
     stub = stub_request(:get, "#{BASE}/v1/ip/history?limit=10").to_return(json_response({ "events" => [] }))
 
