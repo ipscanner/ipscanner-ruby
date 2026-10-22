@@ -109,7 +109,7 @@ class BodiesTest < Minitest::Test
     }
     stub = stub_request(:post, "#{BASE}/v1/gate/verify")
            .with(
-             headers: { "Content-Type" => "application/json", "User-Agent" => "ipscanner-ruby/0.3.0" },
+             headers: { "Content-Type" => "application/json", "User-Agent" => "ipscanner-ruby/0.3.1" },
              body: { "secret" => "gs_x", "token" => "t1", "remote_ip" => "1.2.3.4" }
            )
            .to_return(json_response(response))

@@ -15,7 +15,7 @@ class EmailTest < Minitest::Test
       "mailbox" => "not_checked"
     }
     stub = stub_request(:post, "#{BASE}/v1/email/check")
-           .with(headers: { "Authorization" => "Bearer pk_test", "User-Agent" => "ipscanner-ruby/0.3.0" },
+           .with(headers: { "Authorization" => "Bearer pk_test", "User-Agent" => "ipscanner-ruby/0.3.1" },
                  body: { "email" => "jane@outlok.com" })
            .to_return(json_response(answer))
 
